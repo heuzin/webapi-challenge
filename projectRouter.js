@@ -1,6 +1,7 @@
 const express = require('express');
 
 const Project = require('./data/helpers/projectModel');
+const Action = require('./data/helpers/actionModel')
 
 const router = express.Router();
 
@@ -57,8 +58,7 @@ router.delete('/:id', validateProjectId, (req, res) => {
       });
 });
 
-router.put('/:id', (req, res) => {
-    const { id } = req.params;
+router.put('/:id', validateProjectId, (req, res) => {
     const newProject = req.body
 
     if (!newProject.name || !newProject.description) {
@@ -66,6 +66,7 @@ router.put('/:id', (req, res) => {
             message: "Please provide name and description for the project."
         })
     } else {
+        const { id } = req.params;
         Project.update(id, newProject)
         .then((project) => {
                     res.status(201).json(project);
@@ -98,5 +99,19 @@ function validateProjectId(req, res, next) {
         })
     })
 };
+
+router.get('/:id/actions', (req, res) => {
+    Project.getProjectActions(req.params.id)
+  .then(actions => {
+    res.status(200).json(actions);
+  })
+  .catch (error => {
+    // log error to server
+    console.log(error);
+    res.status(500).json({
+      message: 'Error getting the actions for the project',
+    });
+  });
+});
 
 module.exports = router;
