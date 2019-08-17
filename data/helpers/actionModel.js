@@ -38,4 +38,9 @@ module.exports = {
       .where('id', id)
       .del();
   },
+  getById: function(id) {
+    return db('actions')
+      .where({ id })
+      .first();
+  }
 };
